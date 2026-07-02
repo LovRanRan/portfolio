@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haochen Zhang — AI Agent Engineer</title>
+<meta name="description" content="Portfolio: verifier-backed AI agent systems — MCP tool servers, multi-agent orchestration, and rigorous agent evaluation.">
+<style>
+  :root {
+    --bg: #0b0e14;
+    --bg-card: #121620;
+    --bg-card-hover: #161b28;
+    --border: #232a3a;
+    --text: #e6e9f0;
+    --text-dim: #9aa3b5;
+    --text-faint: #6b7385;
+    --accent: #5eead4;
+    --accent-dim: rgba(94, 234, 212, 0.12);
+    --amber: #fbbf24;
+    --violet: #a78bfa;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11, 14, 20, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { font-family: var(--mono); font-weight: 600; color: var(--accent); text-decoration: none; font-size: 15px; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 14px; transition: color .15s; }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ---------- hero ---------- */
+  header { padding: 96px 0 72px; }
+  .kicker {
+    font-family: var(--mono); font-size: 13px; color: var(--accent);
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px;
+  }
+  h1 { font-size: clamp(34px, 5.5vw, 54px); line-height: 1.12; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 22px; }
+  h1 .hl { color: var(--accent); }
+  .lede { font-size: 19px; color: var(--text-dim); max-width: 680px; margin-bottom: 34px; }
+  .lede strong { color: var(--text); font-weight: 600; }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 22px; border-radius: 8px; font-size: 15px; font-weight: 600;
+    text-decoration: none; transition: all .15s; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--accent); color: #05201b; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-ghost { border-color: var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- pipeline / stack story ---------- */
+  section { padding: 64px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .section-sub { color: var(--text-dim); margin-bottom: 40px; max-width: 720px; }
+  .pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: stretch; }
+  .pipe-node {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; text-align: left;
+  }
+  .pipe-node .step { font-family: var(--mono); font-size: 12px; color: var(--text-faint); margin-bottom: 8px; }
+  .pipe-node .name { font-family: var(--mono); font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .pipe-node .role { font-size: 13.5px; color: var(--text-dim); }
+  .pipe-node.n1 .name { color: var(--violet); }
+  .pipe-node.n2 .name { color: var(--accent); }
+  .pipe-node.n3 .name { color: var(--amber); }
+  .pipe-arrow { display: flex; align-items: center; color: var(--text-faint); font-size: 20px; }
+
+  /* ---------- projects ---------- */
+  .project {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 36px; margin-bottom: 28px; transition: border-color .2s;
+  }
+  .project:hover { border-color: #34405a; }
+  .proj-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 6px; }
+  .proj-title { font-size: 23px; font-weight: 700; font-family: var(--mono); }
+  .proj-title .tag {
+    font-size: 12px; font-weight: 600; font-family: var(--sans);
+    background: var(--accent-dim); color: var(--accent);
+    padding: 3px 10px; border-radius: 999px; margin-left: 12px; vertical-align: middle;
+  }
+  .proj-links { display: flex; gap: 16px; }
+  .proj-links a { font-size: 13.5px; color: var(--accent); text-decoration: none; font-family: var(--mono); }
+  .proj-links a:hover { text-decoration: underline; }
+  .proj-tagline { color: var(--text-dim); font-size: 16px; margin-bottom: 20px; max-width: 760px; }
+  .proj-body { display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; }
+  .proj-points { list-style: none; }
+  .proj-points li { padding-left: 22px; position: relative; margin-bottom: 12px; font-size: 14.5px; color: var(--text-dim); }
+  .proj-points li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+  .proj-points li strong { color: var(--text); }
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+  .metric {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .metric .num { font-family: var(--mono); font-size: 21px; font-weight: 700; color: var(--accent); }
+  .metric .lbl { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+  .stack-row { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--mono); font-size: 12px; color: var(--text-dim);
+    border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px;
+  }
+
+  /* ---------- skills ---------- */
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .skill-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .skill-card h3 { font-size: 15px; margin-bottom: 12px; color: var(--accent); font-family: var(--mono); }
+  .skill-card p { font-size: 14px; color: var(--text-dim); }
+
+  /* ---------- footer ---------- */
+  footer { border-top: 1px solid var(--border); padding: 56px 0 72px; }
+  footer h2 { margin-bottom: 8px; }
+  footer .sub { color: var(--text-dim); margin-bottom: 28px; }
+  .foot-note { margin-top: 48px; font-size: 13px; color: var(--text-faint); }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+  }
+  @media (max-width: 820px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .pipe-arrow { justify-content: center; transform: rotate(90deg); height: 24px; }
+    .proj-body { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr; }
+    header { padding: 64px 0 48px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#">~/portfolio</a>
+    <div class="nav-links">
+      <a href="#stack">The Stack</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="wrap">
+  <div class="kicker">AI Agent Engineer · LLM Systems</div>
+  <h1>I build agent systems that <span class="hl">prove their answers</span> — and the harnesses that measure them.</h1>
+  <p class="lede">
+    Most LLM agents sound confident before they're grounded. I built a full three-layer stack against that:
+    <strong>self-authored MCP tool servers</strong> for deterministic code facts,
+    a <strong>verifier-backed multi-agent system</strong> that labels every claim with evidence,
+    and an <strong>open-source eval harness</strong> that benchmarks agent architectures with real numbers.
+  </p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="#projects">View Projects</a>
+    <a class="btn btn-ghost" href="https://github.com/LovRanRan" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</header>
+
+<section id="stack">
+  <div class="wrap">
+    <h2>One stack, three layers</h2>
+    <p class="section-sub">
+      These aren't three unrelated side projects — each layer is built on the one below it,
+      and the top layer measures the whole thing.
+    </p>
+    <div class="pipeline">
+      <div class="pipe-node n1">
+        <div class="step">01 · Fact layer</div>
+        <div class="name">project5 — MCP servers</div>
+        <div class="role">Three deterministic MCP servers: repo structure, AST symbols, test execution. No LLM inside — they refuse to invent what isn't there.</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node n2">
+        <div class="step">02 · Orchestration layer</div>
+        <div class="name">wayfinder</div>
+        <div class="role">LangGraph multi-agent onboarding copilot that routes questions, grounds claims in MCP evidence, and labels each one verified / unverified / contradicted.</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node n3">
+        <div class="step">03 · Evaluation layer</div>
+        <div class="name">agent-eval-harness</div>
+        <div class="role">Open-source framework scoring routing, factuality, citation grounding, and verification rate — benchmarking Supervisor vs ReAct on 40 real tasks.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <h2>Projects</h2>
+    <p class="section-sub">Flagship first. Every claim below is backed by tests, deploy evidence, or benchmark data in the repos.</p>
+
+    <!-- wayfinder -->
+    <div class="project">
+      <div class="proj-head">
+        <div class="proj-title">wayfinder<span class="tag">Flagship</span></div>
+        <div class="proj-links">
+          <a href="https://wayfinder-dashboard-production-f8d7.up.railway.app" target="_blank" rel="noopener">live demo ↗</a>
+          <a href="https://wayfinder-api-production.up.railway.app/docs" target="_blank" rel="noopener">API docs ↗</a>
+          <a href="https://github.com/LovRanRan/wayfinder" target="_blank" rel="noopener">source ↗</a>
+        </div>
+      </div>
+      <p class="proj-tagline">
+        Verifier-backed codebase onboarding copilot. Point it at an unfamiliar repository and it maps the architecture,
+        explains entry paths from AST evidence, and — unlike most code-explanation tools — shows its uncertainty instead of hiding it.
+      </p>
+      <div class="proj-body">
+        <ul class="proj-points">
+          <li><strong>Evidence-first pipeline:</strong> a LangGraph Supervisor routes each question to role-contracted worker agents (architect_mapper, entry_explainer, verifier) that emit typed ClaimPackets with per-claim provenance.</li>
+          <li><strong>Every claim gets a label:</strong> <code>verified</code> (AST/repo/test evidence), <code>unverified</code> (no grounding — shown, not hidden), or <code>contradicted</code> (a failing test challenges it, and the final prose is rewritten).</li>
+          <li><strong>Hardened NL→symbol resolution:</strong> backticked/dotted symbols, CLI entry points from pyproject.toml, module-behavior questions — ambiguity resolves to "refuse" rather than "guess."</li>
+          <li><strong>Production-shaped:</strong> auth + encrypted key storage, SQLite/Postgres run stores, rate limiting, sandboxed test-runner worker, readiness probes, full trace metadata schema — deployed publicly on Railway with recorded smoke evidence.</li>
+        </ul>
+        <div class="metrics">
+          <div class="metric"><div class="num">3-state</div><div class="lbl">claim labeling with provenance</div></div>
+          <div class="metric"><div class="num">Live</div><div class="lbl">public deploy on Railway</div></div>
+          <div class="metric"><div class="num">4 agents</div><div class="lbl">role contracts + typed claims</div></div>
+          <div class="metric"><div class="num">8+</div><div class="lbl">failure modes with designed mitigations</div></div>
+        </div>
+      </div>
+      <div class="stack-row">
+        <span class="chip">Python 3.11</span><span class="chip">FastAPI</span><span class="chip">LangGraph</span>
+        <span class="chip">MCP</span><span class="chip">Next.js 15</span><span class="chip">Tailwind</span>
+        <span class="chip">Docker Compose</span><span class="chip">Railway</span><span class="chip">GitHub Actions</span>
+      </div>
+    </div>
+
+    <!-- agent-eval-harness -->
+    <div class="project">
+      <div class="proj-head">
+        <div class="proj-title">agent-eval-harness</div>
+        <div class="proj-links">
+          <a href="https://github.com/LovRanRan/agent-eval-harness" target="_blank" rel="noopener">source ↗</a>
+        </div>
+      </div>
+      <p class="proj-tagline">
+        Open-source evaluation framework for LLM agents, shipped with a Supervisor-vs-ReAct benchmark:
+        same model, same five MCP tools, 40 tasks across 10 Python OSS repos — so the comparison isolates <em>orchestration</em>, not tooling.
+      </p>
+      <div class="proj-body">
+        <ul class="proj-points">
+          <li><strong>Headline result:</strong> the Supervisor architecture used <strong>~12× fewer tokens</strong> (396k vs 4.8M) and completed all 40 tasks with zero errors, while the ReAct baseline failed 6/40 by blowing past its recursion limit.</li>
+          <li><strong>Honest reporting:</strong> ReAct scored higher raw answer quality on tasks it finished (factual 0.70 vs 0.48) — the report says so, because a benchmark that hides the trade-off is worthless.</li>
+          <li><strong>Four metrics:</strong> routing accuracy, LLM-as-judge factual correctness with variance-gated self-consistency, citation grounding (anti-hallucination symbol resolver), and verification rate from real pytest execution.</li>
+          <li><strong>Run/score split:</strong> expensive agent runs persist to JSONL; a mid-analysis resolver bug was fixed and re-scored offline for free — citation score corrected 0.37 → 0.80 without re-running a single agent.</li>
+        </ul>
+        <div class="metrics">
+          <div class="metric"><div class="num">12×</div><div class="lbl">fewer tokens, Supervisor vs ReAct</div></div>
+          <div class="metric"><div class="num">40</div><div class="lbl">tasks · 10 OSS repos · 4 buckets</div></div>
+          <div class="metric"><div class="num">0 vs 6</div><div class="lbl">task failures (Supervisor vs ReAct)</div></div>
+          <div class="metric"><div class="num">73</div><div class="lbl">tests · ruff + mypy --strict green</div></div>
+        </div>
+      </div>
+      <div class="stack-row">
+        <span class="chip">Python</span><span class="chip">LLM-as-judge</span><span class="chip">self-consistency</span>
+        <span class="chip">pytest</span><span class="chip">mypy --strict</span><span class="chip">CLI + Python API</span>
+      </div>
+    </div>
+
+    <!-- project5 -->
+    <div class="project">
+      <div class="proj-head">
+        <div class="proj-title">project5 — MCP tool suite</div>
+        <div class="proj-links">
+          <a href="https://github.com/LovRanRan/mcp-repo-mapper" target="_blank" rel="noopener">repo-mapper ↗</a>
+          <a href="https://github.com/LovRanRan/mcp-ast-explorer" target="_blank" rel="noopener">ast-explorer ↗</a>
+          <a href="https://github.com/LovRanRan/mcp-test-runner" target="_blank" rel="noopener">test-runner ↗</a>
+        </div>
+      </div>
+      <p class="proj-tagline">
+        Three self-authored, deterministic MCP servers that form wayfinder's fact layer.
+        None of them contains an LLM — if a symbol doesn't exist, they return a structured not-found instead of inventing an answer.
+      </p>
+      <div class="proj-body">
+        <ul class="proj-points">
+          <li><strong>mcp-repo-mapper:</strong> repository structure, language breakdown, Python dependency graph, circular-dependency detection, framework detection, ranked entry-point candidates.</li>
+          <li><strong>mcp-ast-explorer:</strong> LibCST-based symbol layer — definitions, signatures, references, call chains, class hierarchies. Refuses ambiguous bare names rather than guessing.</li>
+          <li><strong>mcp-test-runner:</strong> bounded pytest/Jest execution (timeouts, CPU/memory limits, shell=False), normalized JSON result parsing, coverage summaries — the layer that turns claims into verdicts.</li>
+          <li><strong>Designed as a stack:</strong> structure → symbols → execution mirrors how an engineer actually reads a new codebase.</li>
+        </ul>
+        <div class="metrics">
+          <div class="metric"><div class="num">3</div><div class="lbl">standalone MCP servers</div></div>
+          <div class="metric"><div class="num">0</div><div class="lbl">LLM calls — fully deterministic</div></div>
+          <div class="metric"><div class="num">16</div><div class="lbl">focused tools across the suite</div></div>
+          <div class="metric"><div class="num">stdio+HTTP</div><div class="lbl">transports, deploy-tested</div></div>
+        </div>
+      </div>
+      <div class="stack-row">
+        <span class="chip">FastMCP 2.x</span><span class="chip">LibCST</span><span class="chip">pytest-json-report</span>
+        <span class="chip">sandboxed subprocess</span><span class="chip">typed results</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <h2>What I bring</h2>
+    <p class="section-sub">The through-line: treating LLM output as a claim to be verified, not an answer to be trusted.</p>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3>Agent systems</h3>
+        <p>LangGraph supervisor/worker orchestration, role contracts, typed claim provenance, human-in-the-loop resume, reflection loops with hard caps, MCP tool authoring (stdio &amp; HTTP).</p>
+      </div>
+      <div class="skill-card">
+        <h3>Evaluation &amp; rigor</h3>
+        <p>LLM-as-judge with self-consistency and variance gating, architecture-blind scoring, run/score decoupling, ground-truth review workflows, honest benchmark reporting.</p>
+      </div>
+      <div class="skill-card">
+        <h3>Production engineering</h3>
+        <p>FastAPI, Postgres/SQLite, Docker Compose, Railway/Cloud Run deploys, sandboxed execution workers, auth &amp; encrypted secrets, rate limiting, observability schemas, CI gates (ruff, mypy --strict, pytest, typecheck).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <h2>Get in touch</h2>
+    <p class="sub">Open to AI/LLM engineering roles. The fastest way to evaluate me is to read the eval report — it grades my own system honestly.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="mailto:13812764054zhc@gmail.com">Email me</a>
+      <a class="btn btn-ghost" href="https://github.com/LovRanRan" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+    <p class="foot-note">Built as a dependency-free static page. No trackers, no framework, loads in one request.</p>
+  </div>
+</footer>
+
+</body>
+</html>
