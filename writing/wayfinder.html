@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding copilots shouldn't sound confident before they're grounded — Haichuan Zhou</title>
+<meta name="description" content="Why I built wayfinder, a multi-agent codebase onboarding copilot organized around evidence instead of narration.">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://haichuanzhou.com/writing/wayfinder.html">
+<meta property="og:title" content="Onboarding copilots shouldn't sound confident before they're grounded">
+<meta property="og:description" content="Why I built wayfinder, a multi-agent codebase onboarding copilot organized around evidence instead of narration.">
+<meta property="og:image" content="https://haichuanzhou.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>if (localStorage.getItem("theme") === "light") document.documentElement.setAttribute("data-theme", "light");</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><div class="wrap"><a href="/">~/portfolio</a><a href="/#writing">← all writing</a></div></nav>
+<article>
+  <div class="kicker">wayfinder · design write-up</div>
+  <h1>Onboarding copilots shouldn't sound confident before they're grounded</h1>
+  <div class="meta">Haichuan Zhou · July 2026 · <a href="https://github.com/LovRanRan/wayfinder">source on GitHub</a> · <a href="https://wayfinder-dashboard-production-f8d7.up.railway.app">live demo</a></div>
+
+  <p>Most codebase onboarding tools have the same failure mode: they sound useful before they are grounded. They can summarize a README, list plausible modules, or explain a function name that looks familiar. What they usually can't tell you is which statements came from code evidence, which are assumptions, and which are contradicted by the tests.</p>
+
+  <p>wayfinder is my answer to that problem. It's a multi-agent codebase onboarding copilot built around <strong>evidence, not narration</strong>. Given a repository and a question, it routes the task through a LangGraph Supervisor, calls deterministic MCP servers for code facts, labels high-risk claims, and writes final answers that preserve uncertainty instead of hiding it.</p>
+
+  <h2>Three agents, three kinds of evidence</h2>
+
+  <p>The system is intentionally split into role-contracted agents, each bound to a deterministic tool I wrote as a standalone MCP server:</p>
+
+  <ul>
+    <li><strong><code>architect_mapper</code></strong> handles orientation. It calls <code>mcp-repo-mapper</code>, which scans file structure, language breakdown, framework signals, entry points, and the Python import graph. Its job is what the repo <em>provably contains</em>.</li>
+    <li><strong><code>entry_explainer</code></strong> explains symbols and call paths via <code>mcp-ast-explorer</code> — LibCST-backed definitions, signatures, references, call chains, class hierarchies. If a symbol doesn't exist, the tool returns a structured not-found. wayfinder is not allowed to invent a nearby symbol just because the query sounds plausible.</li>
+    <li><strong><code>verifier</code></strong> challenges high-risk claims. Static facts get labeled from AST evidence; runtime behavior needs executable evidence from <code>mcp-test-runner</code>, which only runs inside a sandboxed worker.</li>
+  </ul>
+
+  <h2>"Unverified" is a product state</h2>
+
+  <p>Every claim ends up with one of three labels: <strong>verified</strong>, <strong>unverified</strong>, or <strong>contradicted</strong>. The middle label is the important one. No test coverage, an unsupported language, a timeout, malformed output — all of those become <em>unverified</em>, visibly. The system does not silently count uncertainty as success. And when a selected test directly conflicts with a claim, the claim becomes <em>contradicted</em> and the final prose is rewritten through a bounded reflection layer (capped at two rewrites, then the cap itself is disclosed).</p>
+
+  <p>You can see this behavior in the live demo today: ask an architecture question on a public repo and the run completes with its claim counts on display. When the evidence packet can't support a claim, the answer says exactly that — which I'd argue is the single most trust-building thing a code assistant can do.</p>
+
+  <h2>Observability as a schema contract</h2>
+
+  <p>The most consequential engineering decision wasn't in the agent graph — it was deciding that <strong>observability starts as a schema contract</strong>. Every run emits stable metadata keys: agent name, tool name, MCP server, tokens, latency, cost, claim id, thread id, phase. LangSmith can consume those fields when tracing is on, but the Next.js dashboard and my separate eval harness (<a href="https://github.com/LovRanRan/agent-eval-harness">agent-eval-harness</a>) rely on the same shape without live credentials. That one contract is what later made it possible to benchmark this architecture against a ReAct baseline under identical metrics.</p>
+
+  <h2>What it isn't</h2>
+
+  <p>wayfinder is not trying to be a general code chatbot. It's a narrow workflow with a narrow promise: map the repo, explain entry paths, verify risky claims, and show where the answer is uncertain. That narrowness is the point — the interesting work isn't hidden in a prompt, it's visible in the state schema, the MCP boundaries, the verification labels, the failure-mode table, and the dashboard evidence.</p>
+
+  <div class="foot">
+    Built with Python 3.11, FastAPI, LangGraph, three self-authored MCP servers, and a Next.js dashboard, deployed on Railway.
+    Questions? <a href="/">Ask the chatbot on my homepage</a> — it retrieves from this project's actual design notes and cites its sources.
+  </div>
+</article>
+</body>
+</html>

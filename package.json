@@ -9,6 +9,7 @@
     "@anthropic-ai/sdk": "latest"
   },
   "devDependencies": {
+    "playwright-core": "^1.61.1",
     "wrangler": "^4"
   }
 }

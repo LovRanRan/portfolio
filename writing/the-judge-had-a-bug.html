@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My eval framework accused my agent of hallucinating. The bug was in the judge. — Haichuan Zhou</title>
+<meta name="description" content="A citation-grounding resolver bug scored real code references as hallucinations — and why the run/score split made the fix free.">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://haichuanzhou.com/writing/the-judge-had-a-bug.html">
+<meta property="og:title" content="My eval framework accused my agent of hallucinating. The bug was in the judge.">
+<meta property="og:description" content="A citation-grounding resolver bug scored real code references as hallucinations — and why the run/score split made the fix free.">
+<meta property="og:image" content="https://haichuanzhou.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>if (localStorage.getItem("theme") === "light") document.documentElement.setAttribute("data-theme", "light");</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><div class="wrap"><a href="/">~/portfolio</a><a href="/#writing">← all writing</a></div></nav>
+<article>
+  <div class="kicker">agent-eval-harness · postmortem</div>
+  <h1>My eval framework accused my agent of hallucinating. The bug was in the judge.</h1>
+  <div class="meta">Haichuan Zhou · June 2026 · <a href="https://github.com/LovRanRan/agent-eval-harness">source on GitHub</a></div>
+
+  <p>I built <a href="https://github.com/LovRanRan/agent-eval-harness">agent-eval-harness</a> to answer a question most agent projects never ask out loud: <em>does the multi-agent architecture actually beat a simpler baseline, measured honestly?</em> It benchmarks my <a href="wayfinder.html">wayfinder</a> Supervisor against a single-agent ReAct loop — same model, same five MCP tools, 40 tasks across 10 Python OSS repos — so the comparison isolates orchestration, not tooling.</p>
+
+  <p>One of its four metrics is <strong>citation grounding</strong>: the share of code symbols an agent cites that actually exist in the repository. It's the anti-hallucination metric. An agent that says "look at <code>parse_args</code> in <code>cli.py</code>" when no such function exists should pay for it.</p>
+
+  <p>Midway through analyzing the full 40-task run, wayfinder's citation score came back at <strong>0.37</strong>. That number didn't smell right — this is a system whose entire design refuses to name symbols it can't ground in AST evidence. Either my agent was quietly worse than its architecture promised, or my measurement was wrong.</p>
+
+  <h2>The bug</h2>
+
+  <p>The measurement was wrong. The <code>RepoSymbolResolver</code> that powers the metric only credited <strong>top-level <code>def</code> and <code>class</code> names</strong> as "real" symbols. So when an agent cited perfectly legitimate attribute and method references — <code>self.callback</code>, <code>ctx.params</code> — the resolver couldn't find them among top-level names, and scored them as hallucinations.</p>
+
+  <p>Read that again from the judge's perspective: the agent was being <em>penalized for precision</em>. Citing the actual attribute a maintainer would grep for got scored as fabrication, while a vaguer citation of the enclosing function would have passed. The metric was optimizing against exactly the behavior I wanted.</p>
+
+  <p>The fix credits a dotted reference when the attribute genuinely occurs in the repo source — while preserving the anti-hallucination guarantee, because an <em>invented</em> attribute still appears nowhere and still fails.</p>
+
+  <h2>Why the fix cost zero API dollars</h2>
+
+  <p>Here's where an early design decision paid for itself. The harness has a strict <strong>run/score split</strong>: agent runs — the expensive part; a ReAct loop burns ~10× the tokens — are persisted to <code>&lt;arch&gt;.runs.jsonl</code>, and metrics are pure functions over those persisted traces. Fixing the resolver and re-scoring was a local, offline operation:</p>
+
+  <pre><code>agent-eval rescore --runs-dir runs/full_v1 --dataset datasets/full_v1.jsonl</code></pre>
+
+  <p>wayfinder's citation grounding went from <strong>0.37 to ~0.80</strong> without re-running a single agent. No re-spend, no fresh nondeterminism muddying the comparison — the same frozen traces, measured correctly this time.</p>
+
+  <h2>What I took away</h2>
+
+  <ul>
+    <li><strong>Evals are code, and code has bugs.</strong> If a score surprises you, suspect the judge with the same energy you'd suspect the agent. A benchmark number you never audited is a rumor with decimals.</li>
+    <li><strong>Separate the expensive thing from the cheap thing.</strong> Running agents is costly and nondeterministic; scoring is neither. Persisting raw traces makes every future metric fix retroactive and free.</li>
+    <li><strong>Honest reporting compounds.</strong> The final report still shows the ReAct baseline beating wayfinder on raw answer quality (0.70 vs 0.48 factual) while failing 6/40 tasks at ~12× the token cost. Keeping the unflattering number in the headline is what makes the flattering ones believable.</li>
+  </ul>
+
+  <div class="foot">
+    The full benchmark report — four metrics, both architectures, charts, and the reviewed ground truth — lives in the
+    <a href="https://github.com/LovRanRan/agent-eval-harness">repo</a>.
+    Or <a href="/">ask my homepage chatbot</a> about it; it retrieves from the actual eval reports and cites its sources.
+  </div>
+</article>
+</body>
+</html>

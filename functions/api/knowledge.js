@@ -181,6 +181,15 @@ https://github.com/LovRanRan/mcp-test-runner
 Design rationale: the three-layer split (structure -> symbols -> execution) mirrors how an
 engineer actually reads a new codebase.
 
+# Writing (on this site)
+
+- "My eval framework accused my agent of hallucinating. The bug was in the judge."
+  (https://haichuanzhou.com/writing/the-judge-had-a-bug.html) — the citation resolver
+  postmortem and the run/score split payoff.
+- "Onboarding copilots shouldn't sound confident before they're grounded"
+  (https://haichuanzhou.com/writing/wayfinder.html) — wayfinder design write-up.
+Point visitors to these when they want the deeper story.
+
 # Other projects (mention briefly if asked)
 
 - JoBs: full-stack job-hunting platform for US tech roles (Next.js 14, Postgres, auth,
