@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Haichuan Zhou — AI Agent Engineer</title>
 <meta name="description" content="Portfolio: verifier-backed AI agent systems — MCP tool servers, multi-agent orchestration, and rigorous agent evaluation.">
+<script>if (localStorage.getItem("theme") === "light") document.documentElement.setAttribute("data-theme", "light");</script>
 <style>
   :root {
     --bg: #0b0e14;
@@ -18,8 +19,25 @@
     --accent-dim: rgba(94, 234, 212, 0.12);
     --amber: #fbbf24;
     --violet: #a78bfa;
+    --nav-bg: rgba(11, 14, 20, 0.85);
+    --btn-on-accent: #05201b;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+  html[data-theme="light"] {
+    --bg: #f6f7f9;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f3f7;
+    --border: #dee3ec;
+    --text: #171a21;
+    --text-dim: #495063;
+    --text-faint: #8a92a6;
+    --accent: #0d8a76;
+    --accent-dim: rgba(13, 138, 118, 0.10);
+    --amber: #b45309;
+    --violet: #7c3aed;
+    --nav-bg: rgba(246, 247, 249, 0.88);
+    --btn-on-accent: #ffffff;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -35,10 +53,16 @@
   /* ---------- nav ---------- */
   nav {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(11, 14, 20, 0.85);
+    background: var(--nav-bg);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
+  .theme-toggle {
+    background: none; border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text-dim); cursor: pointer; font-size: 15px;
+    width: 34px; height: 34px; margin-left: 20px;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
   nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
   .logo { font-family: var(--mono); font-weight: 600; color: var(--accent); text-decoration: none; font-size: 15px; }
   .nav-links { display: flex; gap: 28px; }
@@ -61,7 +85,7 @@
     padding: 11px 22px; border-radius: 8px; font-size: 15px; font-weight: 600;
     text-decoration: none; transition: all .15s; border: 1px solid transparent;
   }
-  .btn-primary { background: var(--accent); color: #05201b; }
+  .btn-primary { background: var(--accent); color: var(--btn-on-accent); }
   .btn-primary:hover { filter: brightness(1.1); }
   .btn-ghost { border-color: var(--border); color: var(--text); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
@@ -112,6 +136,16 @@
   }
   .metric .num { font-family: var(--mono); font-size: 21px; font-weight: 700; color: var(--accent); }
   .metric .lbl { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+  .chart-row { margin-top: 22px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .chart-row a {
+    display: block; background: #ffffff; border: 1px solid var(--border);
+    border-radius: 10px; padding: 6px; transition: border-color .15s;
+  }
+  .chart-row a:hover { border-color: var(--accent); }
+  .chart-row img { width: 100%; height: auto; display: block; border-radius: 6px; }
+  .chart-row .cap { font-size: 11px; color: #4b5265; text-align: center; padding: 4px 0 2px; font-family: var(--mono); }
+  @media (max-width: 820px) { .chart-row { grid-template-columns: repeat(2, 1fr); } }
+
   .stack-row { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
   .chip {
     font-family: var(--mono); font-size: 12px; color: var(--text-dim);
@@ -196,11 +230,14 @@
 <nav>
   <div class="wrap">
     <a class="logo" href="#">~/portfolio</a>
-    <div class="nav-links">
-      <a href="#stack">The Stack</a>
-      <a href="#projects">Projects</a>
-      <a href="#skills">Skills</a>
-      <a href="#contact">Contact</a>
+    <div style="display:flex; align-items:center;">
+      <div class="nav-links">
+        <a href="#stack">The Stack</a>
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
     </div>
   </div>
 </nav>
@@ -216,6 +253,7 @@
   </p>
   <div class="cta-row">
     <a class="btn btn-primary" href="#projects">View Projects</a>
+    <a class="btn btn-ghost" href="Haichuan_Zhou_Resume.pdf" target="_blank" rel="noopener">Resume ↓</a>
     <a class="btn btn-ghost" href="https://github.com/LovRanRan" target="_blank" rel="noopener">GitHub ↗</a>
   </div>
 </header>
@@ -315,6 +353,12 @@
           <div class="metric"><div class="num">73</div><div class="lbl">tests · ruff + mypy --strict green</div></div>
         </div>
       </div>
+      <div class="chart-row">
+        <a href="assets/charts/cost_scatter.svg" target="_blank"><img src="assets/charts/cost_scatter.svg" alt="Token cost scatter: Supervisor vs ReAct" loading="lazy"><div class="cap">cost</div></a>
+        <a href="assets/charts/factual_correctness_boxplot.svg" target="_blank"><img src="assets/charts/factual_correctness_boxplot.svg" alt="Factual correctness boxplot" loading="lazy"><div class="cap">factual</div></a>
+        <a href="assets/charts/routing_accuracy.svg" target="_blank"><img src="assets/charts/routing_accuracy.svg" alt="Routing accuracy" loading="lazy"><div class="cap">routing</div></a>
+        <a href="assets/charts/verification_rate.svg" target="_blank"><img src="assets/charts/verification_rate.svg" alt="Verification rate" loading="lazy"><div class="cap">verification</div></a>
+      </div>
       <div class="stack-row">
         <span class="chip">Python</span><span class="chip">LLM-as-judge</span><span class="chip">self-consistency</span>
         <span class="chip">pytest</span><span class="chip">mypy --strict</span><span class="chip">CLI + Python API</span>
@@ -354,6 +398,29 @@
         <span class="chip">sandboxed subprocess</span><span class="chip">typed results</span>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <h2>About</h2>
+    <p class="section-sub" style="margin-bottom: 20px;">
+      I'm Haichuan Zhou, an AI engineer currently interning at HireBeat, where I'm the sole
+      engineer on an autonomous job-application agent (LangGraph + Claude) — a grounded,
+      anti-hallucination scoring engine that decides deterministically in Python, not in the LLM.
+    </p>
+    <p class="section-sub" style="margin-bottom: 20px;">
+      The projects on this page came out of one conviction: LLM output is a claim, not an answer.
+      I kept seeing agents that sounded right and weren't — so I built the tool layer that can't
+      hallucinate (deterministic MCP servers), the agent layer that labels its own uncertainty
+      (wayfinder), and the eval layer that measures whether any of it actually works
+      (agent-eval-harness). Even this site's chatbot follows the rule: it answers with retrieval
+      from my real design docs and cites its sources.
+    </p>
+    <p class="section-sub" style="margin-bottom: 0;">
+      M.S. in Analytics (STEM) at USC, expected Dec 2026 · B.S. in Mathematics, CS minor, NYU 2025 ·
+      Based in Los Angeles, open to AI/LLM engineering roles.
+    </p>
   </div>
 </section>
 
@@ -414,6 +481,24 @@
 </div>
 
 <script>
+(function () {
+  // Theme toggle (default dark; persisted)
+  const toggle = document.getElementById("themeToggle");
+  const saved = localStorage.getItem("theme");
+  if (saved === "light") document.documentElement.setAttribute("data-theme", "light");
+  const syncIcon = () => {
+    toggle.textContent = document.documentElement.getAttribute("data-theme") === "light" ? "🌙" : "☀️";
+  };
+  syncIcon();
+  toggle.addEventListener("click", () => {
+    const light = document.documentElement.getAttribute("data-theme") === "light";
+    if (light) document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", "light");
+    localStorage.setItem("theme", light ? "dark" : "light");
+    syncIcon();
+  });
+})();
+
 (function () {
   const fab = document.getElementById("chatFab");
   const panel = document.getElementById("chatPanel");

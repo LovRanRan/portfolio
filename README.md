@@ -48,9 +48,9 @@ npx wrangler pages secret put ANTHROPIC_API_KEY --project-name portfolio
 Or connect the GitHub repo in the Cloudflare Pages dashboard (build command: none,
 output directory: `.`) and add `ANTHROPIC_API_KEY` as an encrypted variable.
 
-## Cost note
+## Cost & abuse controls
 
-The chatbot calls `claude-opus-4-8`. For a public site you may prefer to switch the model
-in `functions/api/chat.js` to `claude-haiku-4-5` to cut cost — the knowledge base is
-small enough that Haiku answers well. Output is capped at 2,048 tokens per reply and the
-conversation is capped at 40 messages.
+The chatbot calls `claude-haiku-4-5` (switch the model in `functions/api/chat.js` to
+`claude-opus-4-8` for maximum answer quality at ~5x the cost). Output is capped at 2,048
+tokens per reply, conversations at 40 messages, and each IP is limited to 10 requests per
+minute (KV-backed sliding window, fails open).

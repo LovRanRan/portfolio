@@ -24,6 +24,23 @@ ${KNOWLEDGE}`;
 
 const MAX_MESSAGES = 40;
 const MAX_MESSAGE_CHARS = 4000;
+const RATE_LIMIT_PER_MINUTE = 10;
+
+// Per-IP sliding-minute rate limit backed by KV. Fails open if KV is unavailable.
+async function rateLimited(env, request) {
+  if (!env.RATE_KV) return false;
+  try {
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+    const windowKey = `rl:${ip}:${Math.floor(Date.now() / 60_000)}`;
+    const count = parseInt((await env.RATE_KV.get(windowKey)) || "0", 10);
+    if (count >= RATE_LIMIT_PER_MINUTE) return true;
+    await env.RATE_KV.put(windowKey, String(count + 1), { expirationTtl: 120 });
+    return false;
+  } catch (err) {
+    console.error("rate limit check failed:", err);
+    return false;
+  }
+}
 const EMBED_MODEL = "@cf/baai/bge-m3";
 const RETRIEVAL_TOP_K = 5;
 const RETRIEVAL_MIN_SCORE = 0.3;
@@ -83,6 +100,13 @@ export async function onRequestPost(context) {
     });
   }
 
+  if (await rateLimited(env, request)) {
+    return new Response(JSON.stringify({ error: "Too many requests — please slow down a little." }), {
+      status: 429,
+      headers: { "Content-Type": "application/json", "Retry-After": "60" },
+    });
+  }
+
   let body;
   try {
     body = await request.json();
@@ -113,7 +137,7 @@ export async function onRequestPost(context) {
   if (retrieved) system.push({ type: "text", text: retrieved });
 
   const stream = client.messages.stream({
-    model: "claude-opus-4-8",
+    model: "claude-haiku-4-5",
     max_tokens: 2048,
     system,
     messages,

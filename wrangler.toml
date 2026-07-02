@@ -8,3 +8,7 @@ binding = "AI"
 [[vectorize]]
 binding = "VECTORIZE"
 index_name = "portfolio-docs"
+
+[[kv_namespaces]]
+binding = "RATE_KV"
+id = "97f0563c998f4e399ee874904f705af4"
