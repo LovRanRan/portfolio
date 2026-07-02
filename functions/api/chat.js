@@ -15,11 +15,44 @@ Guidelines:
 - Reply in the language the visitor writes in (English or Chinese).
 - If asked about contacting or hiring him, share the email and GitHub from the knowledge base.
 - Politely decline requests unrelated to the portfolio (homework, general coding help, etc.).
+- Some replies include "Retrieved documentation excerpts" pulled from the projects' real
+  design docs. When you use them, cite the source file inline, e.g.
+  (source: wayfinder/docs/design_notes/021_routing_grounding_fanout_fix.md).
+  If the excerpts are irrelevant to the question, ignore them silently.
 
 ${KNOWLEDGE}`;
 
 const MAX_MESSAGES = 40;
 const MAX_MESSAGE_CHARS = 4000;
+const EMBED_MODEL = "@cf/baai/bge-m3";
+const RETRIEVAL_TOP_K = 5;
+const RETRIEVAL_MIN_SCORE = 0.3;
+
+// RAG lookup: embed the visitor's question, pull the most relevant chunks from
+// the projects' real design docs. Fails open — chat still works without it.
+async function retrieveContext(env, query) {
+  if (!env.AI || !env.VECTORIZE) return null;
+  try {
+    const embedding = await env.AI.run(EMBED_MODEL, { text: [query] });
+    const vector = embedding?.data?.[0];
+    if (!vector) return null;
+    const result = await env.VECTORIZE.query(vector, {
+      topK: RETRIEVAL_TOP_K,
+      returnMetadata: "all",
+    });
+    const matches = (result?.matches || []).filter(
+      (m) => m.score >= RETRIEVAL_MIN_SCORE && m.metadata?.text
+    );
+    if (matches.length === 0) return null;
+    const excerpts = matches
+      .map((m) => `[source: ${m.metadata.source}${m.metadata.title ? " — " + m.metadata.title : ""}]\n${m.metadata.text}`)
+      .join("\n\n---\n\n");
+    return `# Retrieved documentation excerpts (real project docs — cite sources when used)\n\n${excerpts}`;
+  } catch (err) {
+    console.error("retrieval failed:", err);
+    return null;
+  }
+}
 
 function badRequest(message) {
   return new Response(JSON.stringify({ error: message }), {
@@ -63,16 +96,26 @@ export async function onRequestPost(context) {
 
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
+  // Retrieve doc excerpts for the latest question. The retrieved block goes in
+  // a second system block AFTER the cache breakpoint, so the cached core prompt
+  // stays byte-identical across requests.
+  const lastUserMessage = messages[messages.length - 1];
+  const retrieved =
+    lastUserMessage.role === "user" ? await retrieveContext(env, lastUserMessage.content) : null;
+
+  const system = [
+    {
+      type: "text",
+      text: SYSTEM_PROMPT,
+      cache_control: { type: "ephemeral" },
+    },
+  ];
+  if (retrieved) system.push({ type: "text", text: retrieved });
+
   const stream = client.messages.stream({
     model: "claude-opus-4-8",
     max_tokens: 2048,
-    system: [
-      {
-        type: "text",
-        text: SYSTEM_PROMPT,
-        cache_control: { type: "ephemeral" },
-      },
-    ],
+    system,
     messages,
   });
 

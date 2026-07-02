@@ -1,3 +1,10 @@
 name = "portfolio"
 compatibility_date = "2026-06-01"
 pages_build_output_dir = "."
+
+[ai]
+binding = "AI"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "portfolio-docs"

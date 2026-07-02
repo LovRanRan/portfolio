@@ -9,8 +9,21 @@ the work in depth.
 - `index.html` — the entire site: a dependency-free static page (no build step) plus the
   chat widget UI.
 - `functions/api/chat.js` — Cloudflare Pages Function. Streams responses from the Claude
-  API (`claude-opus-4-8`) with the project knowledge base in a cached system prompt.
+  API (`claude-opus-4-8`). Hybrid RAG: a condensed knowledge base lives in a cached
+  system prompt, and each question additionally retrieves top-5 excerpts from the
+  projects' real design docs via Workers AI (`bge-m3` embeddings) + Vectorize
+  (`portfolio-docs` index, 1024-dim cosine). Answers cite their source files.
+  Retrieval fails open — chat works even if the index is unavailable.
 - `functions/api/knowledge.js` — condensed knowledge base about the featured projects.
+- `functions/api/ingest.js` — secret-gated (Bearer `INGEST_TOKEN`) endpoint that embeds
+  and upserts document chunks into Vectorize.
+- `scripts/ingest.mjs` — reads markdown docs from the sibling project repos
+  (`../wayfinder`, `../agent-eval-harness`, `../project5`), chunks by heading
+  (≤3,500 chars), and POSTs them to `/api/ingest`. Re-run after docs change:
+
+  ```bash
+  INGEST_TOKEN=$(cat .ingest-token) node scripts/ingest.mjs
+  ```
 
 The API key lives only in Cloudflare (or `.dev.vars` locally) — it is never exposed to
 the browser. If the key isn't configured, the endpoint returns 503 and the widget shows a
