@@ -71,7 +71,7 @@ if (await suggestion.isVisible().catch(() => false)) {
   console.log("");
 }
 
-await page.screenshot({ path: "assets/wayfinder-dashboard.png" });
+await page.screenshot({ path: "assets/wayfinder-run-verified.png" });
 console.log("workspace captured:", page.url());
 
 await page.goto(`${BASE}/metrics`, { waitUntil: "networkidle" });

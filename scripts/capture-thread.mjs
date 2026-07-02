@@ -46,6 +46,6 @@ await page.evaluate(() => {
   }
 });
 await page.waitForTimeout(2000);
-await page.screenshot({ path: "assets/wayfinder-dashboard.png" });
+await page.screenshot({ path: "assets/wayfinder-run-verified.png" });
 console.log("captured");
 await browser.close();
