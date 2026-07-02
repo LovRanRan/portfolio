@@ -1,0 +1,114 @@
+{
+  "source": "GET /runs on wayfinder-api-production.up.railway.app, workspace lovranran-portfolio-demo",
+  "captured_at": "2026-07-03T00:00Z (approx)",
+  "runs": [
+    {
+      "job_id": "509a0453-d3f1-4f95-bbfc-82a42ebb5a13",
+      "query": "Where is `Context.forward` defined and what does it do?",
+      "status": "completed",
+      "created_at": "2026-07-02T23:31:40.848292Z",
+      "updated_at": "2026-07-02T23:31:46.049563Z",
+      "duration_seconds": 5.201,
+      "verified_count": 3,
+      "unverified_count": 1,
+      "contradicted_count": 0,
+      "entry_explainer_summary": "Entry explanation evidence collected for Context.forward.\nDefinition: src/click/core.py:909.\nSignature: forward().\nCall chain: none returned.\nReferences: none returned.\nKey functions: none returned.\nData flow evidence: none returned; reference sites show where the symbol is mentioned.\nAssumptions: empty references or call_chain means no evidence was returned, not proof of unused code.\nSource citations: src/click/core.py:909."
+    },
+    {
+      "job_id": "47ec03fe-5eb5-48ad-8161-5406c2c94fb5",
+      "query": "Where is `Group.add_command` defined and what does it do?",
+      "status": "completed",
+      "created_at": "2026-07-02T23:30:23.121567Z",
+      "updated_at": "2026-07-02T23:30:41.867888Z",
+      "duration_seconds": 18.746,
+      "verified_count": 3,
+      "unverified_count": 1,
+      "contradicted_count": 0,
+      "entry_explainer_summary": "Entry explanation evidence collected for Group.add_command.\nDefinition: src/click/core.py:1733.\nSignature: add_command(self, cmd, name).\nCall chain: none returned.\nReferences: none returned.\nKey functions: none returned.\nData flow evidence: none returned; reference sites show where the symbol is mentioned.\nAssumptions: empty references or call_chain means no evidence was returned, not proof of unused code.\nSource citations: src/click/core.py:1733."
+    },
+    {
+      "job_id": "a8ab53d9-ee87-424f-8d02-2ecd57061593",
+      "query": "Where is `Group.command` defined and what does it do?",
+      "status": "completed",
+      "created_at": "2026-07-02T23:13:59.549968Z",
+      "updated_at": "2026-07-02T23:14:44.266848Z",
+      "duration_seconds": 44.717,
+      "verified_count": 3,
+      "unverified_count": 1,
+      "contradicted_count": 0,
+      "entry_explainer_summary": "Entry explanation evidence collected for Group.command.\nDefinition: src/click/core.py:1751.\nSignature: command(self).\nCall chain: none returned.\nReferences: none returned.\nKey functions: none returned.\nData flow evidence: none returned; reference sites show where the symbol is mentioned.\nAssumptions: empty references or call_chain means no evidence was returned, not proof of unused code.\nSource citations: src/click/core.py:1751."
+    },
+    {
+      "job_id": "ad3b1170-811d-4b20-9f17-5d80015792f8",
+      "query": "Where is `Context.invoke` defined and what does it do?",
+      "status": "completed",
+      "created_at": "2026-07-02T23:12:49.128469Z",
+      "updated_at": "2026-07-02T23:13:36.440294Z",
+      "duration_seconds": 47.312,
+      "verified_count": 3,
+      "unverified_count": 1,
+      "contradicted_count": 0,
+      "entry_explainer_summary": "Entry explanation evidence collected for Context.invoke.\nDefinition: src/click/core.py:853.\nSignature: invoke().\nCall chain: none returned.\nReferences: none returned.\nKey functions: none returned.\nData flow evidence: none returned; reference sites show where the symbol is mentioned.\nAssumptions: empty references or call_chain means no evidence was returned, not proof of unused code.\nSource citations: src/click/core.py:853."
+    },
+    {
+      "job_id": "e4f65b24-1f0a-452d-94ab-8fbd10de67a3",
+      "query": "Where is `Command.invoke` defined and what does it do?",
+      "status": "completed",
+      "created_at": "2026-07-02T22:57:59.424791Z",
+      "updated_at": "2026-07-02T22:58:48.421659Z",
+      "duration_seconds": 48.997,
+      "verified_count": 3,
+      "unverified_count": 1,
+      "contradicted_count": 0,
+      "entry_explainer_summary": "Entry explanation evidence collected for Command.invoke.\nDefinition: src/click/core.py:1353.\nSignature: invoke(self, ctx).\nCall chain: none returned.\nReferences: none returned.\nKey functions: none returned.\nData flow evidence: none returned; reference sites show where the symbol is mentioned.\nAssumptions: empty references or call_chain means no evidence was returned, not proof of unused code.\nSource citations: src/click/core.py:1353."
+    },
+    {
+      "job_id": "52bf78bb-5a62-4fcc-8360-e905b4c74bf8",
+      "query": "Where is `BaseCommand.invoke` defined and what does it do?",
+      "status": "completed",
+      "created_at": "2026-07-02T22:38:35.212732Z",
+      "updated_at": "2026-07-02T22:38:51.982094Z",
+      "duration_seconds": 16.769,
+      "verified_count": 0,
+      "unverified_count": 0,
+      "contradicted_count": 0,
+      "entry_explainer_summary": "Entry explanation degraded for BaseCommand.invoke: the AST evidence tool failed. Evidence limitation: MCP tool timed out after 8s. No references or call chain are asserted without definition evidence."
+    },
+    {
+      "job_id": "bee38334-d944-4fba-a90f-1f40eaa635d7",
+      "query": "Open https://github.com/pallets/click and map the architecture",
+      "status": "completed",
+      "created_at": "2026-07-02T22:27:38.613671Z",
+      "updated_at": "2026-07-02T22:27:47.362750Z",
+      "duration_seconds": 8.749,
+      "verified_count": 0,
+      "unverified_count": 0,
+      "contradicted_count": 0,
+      "entry_explainer_summary": ""
+    },
+    {
+      "job_id": "71c19570-90b8-47bf-8633-87867b260eeb",
+      "query": "Open https://github.com/pallets/click and map the architecture",
+      "status": "failed",
+      "created_at": "2026-07-02T22:15:11.210705Z",
+      "updated_at": "2026-07-02T22:15:11.283557Z",
+      "duration_seconds": 0.073,
+      "verified_count": 0,
+      "unverified_count": 0,
+      "contradicted_count": 0,
+      "entry_explainer_summary": ""
+    },
+    {
+      "job_id": "94f79cce-1e6c-4e34-a514-13ba22e46f5c",
+      "query": "Open https://github.com/pallets/click and map the architecture",
+      "status": "failed",
+      "created_at": "2026-07-02T22:10:14.108355Z",
+      "updated_at": "2026-07-02T22:10:15.197982Z",
+      "duration_seconds": 1.09,
+      "verified_count": 0,
+      "unverified_count": 0,
+      "contradicted_count": 0,
+      "entry_explainer_summary": ""
+    }
+  ]
+}

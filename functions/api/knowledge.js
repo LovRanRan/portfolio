@@ -183,6 +183,11 @@ engineer actually reads a new codebase.
 
 # Writing (on this site)
 
+- "The timeout wasn't the bug"
+  (https://haichuanzhou.com/writing/the-timeout-was-not-the-bug.html) — production
+  postmortem: deployed wayfinder symbol questions all timed out because mcp-ast-explorer
+  rebuilt its CST index on every tool call; a fingerprint-invalidated index cache
+  (v0.2.0) took grounded runs from ~49s to 5.2s, verified against production runs.
 - "My eval framework accused my agent of hallucinating. The bug was in the judge."
   (https://haichuanzhou.com/writing/the-judge-had-a-bug.html) — the citation resolver
   postmortem and the run/score split payoff.

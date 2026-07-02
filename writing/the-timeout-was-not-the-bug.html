@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The timeout wasn't the bug — Haichuan Zhou</title>
+<meta name="description" content="A production postmortem: why every symbol question on my deployed agent timed out, and how a CST index cache took grounded runs from ~49s to 5.2s.">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://haichuanzhou.com/writing/the-timeout-was-not-the-bug.html">
+<meta property="og:title" content="The timeout wasn't the bug">
+<meta property="og:description" content="A production postmortem: why every symbol question on my deployed agent timed out, and how a CST index cache took grounded runs from ~49s to 5.2s.">
+<meta property="og:image" content="https://haichuanzhou.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>if (localStorage.getItem("theme") === "light") document.documentElement.setAttribute("data-theme", "light");</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><div class="wrap"><a href="/">~/portfolio</a><a href="/#writing">← all writing</a></div></nav>
+<article>
+  <div class="kicker">wayfinder · production postmortem</div>
+  <h1>The timeout wasn't the bug</h1>
+  <div class="meta">Haichuan Zhou · July 2026 · <a href="https://github.com/LovRanRan/mcp-ast-explorer">mcp-ast-explorer</a> · <a href="https://github.com/LovRanRan/wayfinder">wayfinder</a></div>
+
+  <p>While putting a screenshot of <a href="wayfinder.html">wayfinder</a>'s deployed instance on this site, I noticed something embarrassing: every symbol question — the exact query type the system is built to answer with verified, file-and-line evidence — came back with <strong>zero verified claims</strong>. The answers were honest about it ("I can't verify where this is defined from the evidence in this packet"), which is the product working as designed. But the evidence should have been there.</p>
+
+  <h2>Following the trace</h2>
+
+  <p>wayfinder persists per-run trace metadata precisely for moments like this. The run record pointed straight at the failing hop:</p>
+
+  <blockquote>Entry explanation degraded for BaseCommand.invoke: the AST evidence tool failed. Evidence limitation: MCP tool timed out after 8s.</blockquote>
+
+  <p>The deployed config ran MCP tool calls with an 8-second timeout and a single attempt. So the question became: why does an AST lookup take more than 8 seconds?</p>
+
+  <p>Reading <code>mcp-ast-explorer</code>'s server code gave the answer: <strong>every tool call rebuilt the full LibCST index from scratch</strong>. <code>find_definition</code>, <code>function_signature</code>, <code>find_references</code>, <code>call_chain</code> — each one called <code>build_cst_index(path)</code> with no caching. I timed it locally against <code>pallets/click</code> (63 Python files): <strong>~5.4 seconds per build</strong> on an M-series laptop. On Railway's shared vCPU, comfortably past 8 seconds — and a single grounded run makes several of these calls. Every symbol question was structurally guaranteed to time out.</p>
+
+  <p>(A fun detour: my first test query asked about <code>BaseCommand.invoke</code>, and even after fixing the timeout the answer refused to locate it. That wasn't a bug — <code>BaseCommand</code> no longer exists on click's main branch. The honest not-found was correct. Debug with symbols that exist.)</p>
+
+  <h2>Stopgap, then the real fix</h2>
+
+  <p>First, stop the bleeding with config: tool timeout 8s → 30s, one attempt → two, graph-node timeout raised to cover both. Symbol questions — now asking about <code>Command.invoke</code>, which does exist — immediately started returning <strong>verified 3 / unverified 1</strong>: definition at <code>src/click/core.py:1353</code>, signature, qualified name, all labeled from AST evidence. But each grounded run took 44.7–49.0 seconds, because the index was still being rebuilt on every tool call.</p>
+
+  <p>The real fix is a small, boring cache in <code>mcp-ast-explorer</code> (v0.2.0): an in-process <code>CstIndexCache</code> keyed by resolved repo root, invalidated by a per-file <code>(path, size, mtime_ns)</code> fingerprint. Stat-ing every file is cheap next to re-parsing it, and any edit, addition, or deletion changes the fingerprint and triggers a rebuild. Locally: cold build 5.6s, warm hit <strong>4ms</strong>.</p>
+
+  <h2>"Deployed" is a claim — verify it</h2>
+
+  <p>Here's the part of the story I didn't expect to write. The cache fix was implemented and I believed it was deployed. When I measured the live instance, nothing had changed. Checking the chain end to end: the code existed only as uncommitted changes in a local worktree; GitHub main didn't have it; PyPI was two versions behind; and wayfinder's Dockerfile installed the dependency from <code>git+...@main</code> — so even a successful rebuild had faithfully shipped the old code.</p>
+
+  <p>The fix for that class of failure is the same discipline as everything else in this stack: commit, push, and <strong>pin the dependency to a commit SHA</strong> in the Dockerfile. The pin doubles as a Docker layer-cache bust — bumping the SHA forces the install layer to rebuild, so "it built" and "it shipped" can't quietly diverge again.</p>
+
+  <h2>Results, measured on production</h2>
+
+  <ul>
+    <li><strong>Before any fix:</strong> every symbol question timed out — 0 verified claims, degraded answers.</li>
+    <li><strong>Timeout raised (index still rebuilt per call):</strong> 44.7–49.0s per grounded run, verified 3 / unverified 1.</li>
+    <li><strong>Cache deployed, cold container:</strong> 18.7s — the first AST call builds the index once and the rest of the run reuses it.</li>
+    <li><strong>Cache warm:</strong> <strong>5.2s</strong> per grounded run. Roughly 9× faster than the timeout-only stopgap, with identical verification labels.</li>
+  </ul>
+
+  <h2>Takeaways</h2>
+
+  <ul>
+    <li><strong>A timeout you have to raise is a smell, not a fix.</strong> The 8s limit wasn't wrong — it was correctly refusing to wait for work that shouldn't exist. Raising it bought time to remove the work.</li>
+    <li><strong>Trace → source → local reproduction beats guessing.</strong> The run metadata named the failing tool, the tool's source named the wasted work, and a two-line timing script confirmed it before touching production.</li>
+    <li><strong>"Deployed" is a verifiable claim.</strong> Treat it like one: the artifact serving traffic either contains the commit or it doesn't. SHA-pinned dependencies make the answer checkable from the Dockerfile alone.</li>
+    <li>There's a pleasing symmetry in debugging a verified-claims system this way: every step of the diagnosis was itself a claim backed by evidence — a trace record, a timing measurement, a git log, a production run. That's the whole thesis of <a href="wayfinder.html">the project</a>, applied to its own operations.</li>
+  </ul>
+
+  <div class="foot">
+    Evidence for the numbers above: <a href="evidence/ast-cache-production-runs.md">run-by-run timeline</a> and the
+    <a href="evidence/ast-cache-production-runs.json">raw production run records</a> (verbatim <code>GET /runs</code> snapshot).
+    The cache: <a href="https://github.com/LovRanRan/mcp-ast-explorer">mcp-ast-explorer</a> commit <code>8126b9f</code>.
+    The pin: <a href="https://github.com/LovRanRan/wayfinder">wayfinder</a> commit <code>b3e9b4b</code>.
+    Or <a href="/">ask my homepage chatbot</a> — it retrieves from the projects' real docs and cites its sources.
+  </div>
+</article>
+</body>
+</html>
