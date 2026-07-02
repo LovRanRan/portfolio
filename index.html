@@ -168,54 +168,92 @@
     .nav-links { display: none; }
   }
 
-  /* ---------- chat widget ---------- */
-  .chat-fab {
-    position: fixed; bottom: 24px; right: 24px; z-index: 100;
-    width: 56px; height: 56px; border-radius: 50%;
-    background: var(--accent); color: #05201b; border: none; cursor: pointer;
-    font-size: 24px; box-shadow: 0 8px 24px rgba(0,0,0,.45);
-    display: flex; align-items: center; justify-content: center;
-    transition: transform .15s;
+  /* ---------- chat (centered modal) ---------- */
+  .nav-ask {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--accent); color: var(--btn-on-accent);
+    border: none; border-radius: 999px; padding: 8px 16px;
+    font-size: 13.5px; font-weight: 700; cursor: pointer; margin-left: 20px;
+    transition: filter .15s;
   }
-  .chat-fab:hover { transform: scale(1.06); }
-  .chat-panel {
-    position: fixed; bottom: 94px; right: 24px; z-index: 100;
-    width: min(400px, calc(100vw - 32px)); height: min(560px, calc(100vh - 130px));
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-    display: none; flex-direction: column; overflow: hidden;
-    box-shadow: 0 16px 48px rgba(0,0,0,.55);
+  .nav-ask:hover { filter: brightness(1.1); }
+  .ask-bar {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 680px; margin-top: 36px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 20px; cursor: text; transition: border-color .15s;
+    text-align: left;
   }
-  .chat-panel.open { display: flex; }
+  .ask-bar:hover { border-color: var(--accent); }
+  .ask-bar .icon { font-size: 19px; }
+  .ask-bar .ph { color: var(--text-faint); font-size: 15.5px; flex: 1; }
+  .ask-bar .kbd {
+    font-family: var(--mono); font-size: 11.5px; color: var(--text-faint);
+    border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px;
+  }
+  .chat-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(4, 6, 10, 0.6); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+  }
+  .chat-overlay.open { display: flex; }
+  .chat-modal {
+    width: min(760px, 94vw); height: min(80vh, 780px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,.5);
+  }
   .chat-head {
-    padding: 14px 18px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
   }
-  .chat-head .t { font-weight: 700; font-size: 15px; }
-  .chat-head .s { font-size: 12px; color: var(--text-faint); }
-  .chat-close { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 18px; }
-  .chat-log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-  .chat-msg { max-width: 88%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; word-wrap: break-word; }
+  .chat-head .t { font-weight: 700; font-size: 17px; }
+  .chat-head .s { font-size: 13px; color: var(--text-faint); margin-top: 2px; }
+  .chat-close {
+    background: none; border: 1px solid var(--border); border-radius: 8px;
+    width: 34px; height: 34px; color: var(--text-dim); cursor: pointer; font-size: 16px;
+  }
+  .chat-close:hover { border-color: var(--accent); color: var(--accent); }
+  .chat-log {
+    flex: 1; overflow-y: auto; padding: 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .chat-msg {
+    max-width: 85%; padding: 13px 17px; border-radius: 14px;
+    font-size: 15px; line-height: 1.65; word-wrap: break-word;
+  }
+  .chat-msg p { margin: 0 0 10px; }
+  .chat-msg p:last-child { margin-bottom: 0; }
+  .chat-msg code {
+    font-family: var(--mono); font-size: 13px;
+    background: var(--accent-dim); border-radius: 4px; padding: 1px 5px;
+  }
   .chat-msg.user { align-self: flex-end; background: var(--accent-dim); color: var(--text); border: 1px solid rgba(94,234,212,.25); }
   .chat-msg.bot { align-self: flex-start; background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); }
   .chat-msg.bot.thinking::after { content: "▍"; animation: blink 1s step-start infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  .chat-suggest { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 8px; }
+  .chat-suggest { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 12px; flex-shrink: 0; }
   .chat-suggest button {
-    font-size: 12px; color: var(--accent); background: none;
-    border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px; cursor: pointer;
+    font-size: 13px; color: var(--accent); background: none;
+    border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; cursor: pointer;
   }
   .chat-suggest button:hover { border-color: var(--accent); }
-  .chat-input-row { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); }
+  .chat-input-row { display: flex; gap: 10px; padding: 16px 24px 20px; border-top: 1px solid var(--border); flex-shrink: 0; }
   .chat-input-row input {
-    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-    color: var(--text); padding: 10px 12px; font-size: 14px; outline: none;
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); padding: 13px 16px; font-size: 15px; outline: none;
   }
   .chat-input-row input:focus { border-color: var(--accent); }
   .chat-send {
-    background: var(--accent); color: #05201b; border: none; border-radius: 8px;
-    padding: 0 16px; font-weight: 700; cursor: pointer;
+    background: var(--accent); color: var(--btn-on-accent); border: none; border-radius: 10px;
+    padding: 0 22px; font-weight: 700; font-size: 15px; cursor: pointer;
   }
   .chat-send:disabled { opacity: .5; cursor: default; }
+  @media (max-width: 640px) {
+    .chat-modal { width: 100vw; height: 100dvh; border-radius: 0; border: none; }
+    .nav-ask { margin-left: 0; padding: 7px 13px; font-size: 13px; }
+    .ask-bar .kbd { display: none; }
+  }
   @media (max-width: 820px) {
     .pipeline { grid-template-columns: 1fr; }
     .pipe-arrow { justify-content: center; transform: rotate(90deg); height: 24px; }
@@ -238,6 +276,7 @@
         <a href="#contact">Contact</a>
       </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+      <button class="nav-ask" id="navAsk">💬 Ask AI</button>
     </div>
   </div>
 </nav>
@@ -256,6 +295,11 @@
     <a class="btn btn-ghost" href="Haichuan_Zhou_Resume.pdf" target="_blank" rel="noopener">Resume ↓</a>
     <a class="btn btn-ghost" href="https://github.com/LovRanRan" target="_blank" rel="noopener">GitHub ↗</a>
   </div>
+  <button class="ask-bar" id="askBar" aria-label="Open AI chat">
+    <span class="icon">💬</span>
+    <span class="ph">Ask my AI anything about these projects — it answers from my real design docs, with sources…</span>
+    <span class="kbd">/</span>
+  </button>
 </header>
 
 <section id="stack">
@@ -457,26 +501,28 @@
   </div>
 </footer>
 
-<button class="chat-fab" id="chatFab" aria-label="Open chat">💬</button>
-<div class="chat-panel" id="chatPanel" role="dialog" aria-label="Portfolio assistant">
-  <div class="chat-head">
-    <div>
-      <div class="t">Ask about my work</div>
-      <div class="s">AI assistant · knows these projects in depth</div>
+<div class="chat-overlay" id="chatOverlay">
+  <div class="chat-modal" role="dialog" aria-modal="true" aria-label="Portfolio assistant">
+    <div class="chat-head">
+      <div>
+        <div class="t">Ask about my work</div>
+        <div class="s">AI assistant · retrieval over my real design docs · answers cite sources · 中英文均可</div>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
     </div>
-    <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
-  </div>
-  <div class="chat-log" id="chatLog">
-    <div class="chat-msg bot">Hi! I can walk you through wayfinder, agent-eval-harness, and the MCP tool suite — architecture, benchmark numbers, design trade-offs. What would you like to know? (中文也可以)</div>
-  </div>
-  <div class="chat-suggest" id="chatSuggest">
-    <button>How does wayfinder verify its claims?</button>
-    <button>What did the benchmark find?</button>
-    <button>Why build your own MCP servers?</button>
-  </div>
-  <div class="chat-input-row">
-    <input id="chatInput" type="text" placeholder="Ask anything about these projects…" maxlength="1000">
-    <button class="chat-send" id="chatSend">Send</button>
+    <div class="chat-log" id="chatLog">
+      <div class="chat-msg bot"><p>Hi! I can walk you through <strong>wayfinder</strong>, <strong>agent-eval-harness</strong>, and the <strong>MCP tool suite</strong> — architecture, benchmark numbers, design trade-offs. Answers are grounded in the projects' actual design docs, with sources cited.</p><p>What would you like to know?</p></div>
+    </div>
+    <div class="chat-suggest" id="chatSuggest">
+      <button>How does wayfinder verify its claims?</button>
+      <button>What did the benchmark find?</button>
+      <button>Why build your own MCP servers?</button>
+      <button>这三个项目是什么关系?</button>
+    </div>
+    <div class="chat-input-row">
+      <input id="chatInput" type="text" placeholder="Ask anything about these projects…" maxlength="1000">
+      <button class="chat-send" id="chatSend">Send</button>
+    </div>
   </div>
 </div>
 
@@ -500,8 +546,7 @@
 })();
 
 (function () {
-  const fab = document.getElementById("chatFab");
-  const panel = document.getElementById("chatPanel");
+  const overlay = document.getElementById("chatOverlay");
   const log = document.getElementById("chatLog");
   const input = document.getElementById("chatInput");
   const send = document.getElementById("chatSend");
@@ -510,11 +555,27 @@
   const history = [];
   let busy = false;
 
-  fab.addEventListener("click", () => {
-    panel.classList.toggle("open");
-    if (panel.classList.contains("open")) input.focus();
+  function openChat() {
+    overlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+    setTimeout(() => input.focus(), 50);
+  }
+  function closeChat() {
+    overlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  document.getElementById("navAsk").addEventListener("click", openChat);
+  document.getElementById("askBar").addEventListener("click", openChat);
+  document.getElementById("chatClose").addEventListener("click", closeChat);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeChat(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && overlay.classList.contains("open")) closeChat();
+    if (e.key === "/" && !overlay.classList.contains("open") &&
+        !/INPUT|TEXTAREA/.test(document.activeElement?.tagName || "")) {
+      e.preventDefault();
+      openChat();
+    }
   });
-  document.getElementById("chatClose").addEventListener("click", () => panel.classList.remove("open"));
 
   suggest.addEventListener("click", (e) => {
     if (e.target.tagName === "BUTTON") {
@@ -523,10 +584,28 @@
     }
   });
 
+  // Minimal safe markdown: escape everything first, then re-introduce
+  // bold / inline code / paragraphs only.
+  function renderMarkdown(text) {
+    const esc = text
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return esc
+      .split(/\n{2,}/)
+      .map((para) =>
+        "<p>" +
+        para
+          .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+          .replace(/`([^`]+)`/g, "<code>$1</code>")
+          .replace(/\n/g, "<br>") +
+        "</p>")
+      .join("");
+  }
+
   function addMsg(role, text) {
     const div = document.createElement("div");
     div.className = "chat-msg " + role;
-    div.textContent = text;
+    if (role === "user") div.textContent = text;
+    else div.innerHTML = renderMarkdown(text);
     log.appendChild(div);
     log.scrollTop = log.scrollHeight;
     return div;
@@ -563,7 +642,7 @@
         const { done, value } = await reader.read();
         if (done) break;
         full += decoder.decode(value, { stream: true });
-        botDiv.textContent = full;
+        botDiv.innerHTML = renderMarkdown(full);
         log.scrollTop = log.scrollHeight;
       }
       history.push({ role: "assistant", content: full || "…" });
