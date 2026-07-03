@@ -199,6 +199,9 @@
   footer { border-top: 1px solid var(--border); padding: 56px 0 72px; }
   footer h2 { margin-bottom: 8px; }
   footer .sub { color: var(--text-dim); margin-bottom: 28px; }
+  .email-line { margin-top: 18px; font-size: 14px; color: var(--text-dim); }
+  .email-line code { font-family: var(--mono); background: var(--accent-dim); padding: 3px 8px; border-radius: 6px; }
+  .email-line a { color: var(--accent); font-size: 13px; }
   .foot-note { margin-top: 48px; font-size: 13px; color: var(--text-faint); }
 
   @media (max-width: 640px) {
@@ -563,9 +566,10 @@
     <h2>Get in touch</h2>
     <p class="sub">Open to AI/LLM engineering roles. The fastest way to evaluate me is to read the eval report — it grades my own system honestly.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="mailto:13812764054zhc@gmail.com">Email me</a>
+      <button class="btn btn-primary" id="copyEmail" data-email="13812764054zhc@gmail.com">Copy email</button>
       <a class="btn btn-ghost" href="https://github.com/LovRanRan" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
+    <p class="email-line"><code>13812764054zhc@gmail.com</code> · <a href="mailto:13812764054zhc@gmail.com">open in mail app</a></p>
     <p class="foot-note">Built as a dependency-free static page. No trackers, no framework, loads in one request.</p>
   </div>
 </footer>
@@ -611,6 +615,27 @@
     else document.documentElement.setAttribute("data-theme", "light");
     localStorage.setItem("theme", light ? "dark" : "light");
     syncIcon();
+  });
+})();
+
+(function () {
+  // Copy-email button: works everywhere, unlike bare mailto.
+  const copyBtn = document.getElementById("copyEmail");
+  copyBtn.addEventListener("click", async () => {
+    const email = copyBtn.dataset.email;
+    try {
+      await navigator.clipboard.writeText(email);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = email;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    const old = copyBtn.textContent;
+    copyBtn.textContent = "Copied ✓";
+    setTimeout(() => { copyBtn.textContent = old; }, 2000);
   });
 })();
 
