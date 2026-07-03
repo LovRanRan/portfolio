@@ -175,19 +175,29 @@
     border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px;
   }
 
-  /* ---------- writing ---------- */
-  .writing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  /* ---------- writing (auto-scrolling marquee) ---------- */
+  .writing-marquee {
+    overflow: hidden; margin: 0 -24px; padding: 4px 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .writing-track {
+    display: flex; gap: 20px; width: max-content; padding: 0 24px;
+  }
   .writing-card {
     display: block; background: var(--bg-card); border: 1px solid var(--border);
     border-radius: 14px; padding: 26px 28px; text-decoration: none;
     transition: border-color .15s;
+    width: min(400px, 80vw); flex-shrink: 0;
   }
   .writing-card:hover { border-color: var(--accent); }
   .w-kicker { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 10px; }
   .w-title { font-size: 18.5px; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 10px; }
   .w-teaser { font-size: 14px; color: var(--text-dim); margin-bottom: 14px; }
   .w-more { font-size: 13.5px; color: var(--accent); font-weight: 600; }
-  @media (max-width: 820px) { .writing-grid { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) {
+    .writing-marquee { overflow-x: auto; mask-image: none; -webkit-mask-image: none; }
+  }
 
   /* ---------- skills ---------- */
   .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -494,7 +504,8 @@
   <div class="wrap">
     <h2>Writing</h2>
     <p class="section-sub">Design write-ups and postmortems from building the stack above.</p>
-    <div class="writing-grid">
+    <div class="writing-marquee">
+    <div class="writing-track" id="writingTrack">
       <a class="writing-card" href="writing/the-timeout-was-not-the-bug.html">
         <div class="w-kicker">wayfinder · production postmortem</div>
         <div class="w-title">The timeout wasn't the bug</div>
@@ -513,6 +524,7 @@
         <div class="w-teaser">Why wayfinder is organized around evidence instead of narration: three role-contracted agents, three claim labels, and observability as a schema contract.</div>
         <div class="w-more">Read →</div>
       </a>
+    </div>
     </div>
   </div>
 </section>
@@ -616,6 +628,37 @@
     localStorage.setItem("theme", light ? "dark" : "light");
     syncIcon();
   });
+})();
+
+(function () {
+  // Writing marquee: clone the card set until one "half" spans at least the
+  // viewport, then clone that half once more so translateX(-half) loops
+  // seamlessly. Duration scales with width for constant speed.
+  const track = document.getElementById("writingTrack");
+  if (track && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const addClones = (nodes) => {
+      nodes.forEach((c) => {
+        const clone = c.cloneNode(true);
+        clone.setAttribute("aria-hidden", "true");
+        clone.tabIndex = -1;
+        track.appendChild(clone);
+      });
+    };
+    const originals = [...track.children];
+    const target = Math.max(window.innerWidth, 1600);
+    while (track.scrollWidth < target) addClones(originals);
+    const halfCount = track.children.length;
+    addClones([...track.children]);
+    // Exact loop period = distance between the two identical halves,
+    // including the flex gap — measured, not assumed.
+    const shift = track.children[halfCount].offsetLeft - track.children[0].offsetLeft;
+    const anim = track.animate(
+      [{ transform: "translateX(0)" }, { transform: `translateX(-${shift}px)` }],
+      { duration: (shift / 40) * 1000, iterations: Infinity } // ~40px/s
+    );
+    track.addEventListener("mouseenter", () => anim.pause());
+    track.addEventListener("mouseleave", () => anim.play());
+  }
 })();
 
 (function () {
